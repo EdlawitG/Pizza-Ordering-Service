@@ -1,35 +1,38 @@
 const { Model, DataTypes, sequelize } = require("sequelize");
-const Pizza = require("./pizza");
+const Pizza = require("./pizzamodel");
 const Topping = require("./toppingmodel");
-
-class Pizza_Topping extends Model {}
-
-Pizza_Topping.init(
-  {
-    pizza_id: {
-      type: DataTypes.UUIDV4,
-      references: {
-        model: Pizza,
-        key: id,
+module.exports = (sequelize, DataTypes) => {
+  class Pizza_Topping extends Model {
+    static associate(models) {}
+  }
+  Pizza_Topping.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
+      pizza_id: {
+        type: DataTypes.UUIDV4,
+        references: {
+          model: Pizza,
+          key: "id",
+        },
+      },
+      topping_id: {
+        type: DataTypes.UUIDV4,
+        references: {
+          model: Topping,
+          key: "id",
+        },
       },
     },
-    topping_id: {
-      type: DataTypes.UUIDV4,
-      references: {
-        model: Topping,
-        key: id,
-      }
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-  },
-  {
-    sequelize,
-    modelName: "Pizza_Topping",
-    tableName: "pizza_toppings",
-    timestamps: false,
-  }
-);
-module.exports = Pizza_Topping;
+    {
+      sequelize,
+      modelName: "Pizza_Topping",
+      tableName: "pizza_toppings",
+      timestamps: false,
+    }
+  );
+  return Pizza_Topping;
+};

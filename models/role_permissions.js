@@ -1,28 +1,37 @@
-const { Model, DataTypes, sequelize } = require("sequelize");
-const Permission = require('./permissionmodel');
-const Role = require('./rolemodel');
+const Permission = require("./permissionmodel");
+const Role = require("./rolemodel");
+const { Model } = require("sequelize");
 
-class Role_Permissions extends Model {}
+module.exports = (sequelize, DataTypes) => {
+  const Role_Permissions = sequelize.define('Role_Permissions', 
+    {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
+      role_id: {
+        type: DataTypes.UUID,
+        // reference: {
+        //   model: Role,
+        //   key: "id",
+        // },
+      },
+      permission_id: {
+        type: DataTypes.UUID,
+        // reference: {
+        //   model: Permission,
+        //   key: "id",
+        // },
+      },
+    },
+    {
+      sequelize,
+      modelName: "Role_Permissions",
+      tableName: "role_permissions",
+      timestamps: false,
+    }
+  );
+  return Role_Permissions;
+};
 
-Role.init({
-  role_id: {
-    type: DataTypes.UUIDV4,
-    reference:{
-        model: Role,
-        key: id,
-    }
-  },
-  permission_id: {
-    type: DataTypes.UUIDV4,
-    reference:{
-        model: Permission,
-        key:id
-    }
-  }
-}, {
-  sequelize,
-  modelName: 'Role_Permissions',
-  tableName: 'role_permissions',
-  timestamps: false
-});
-module.exports = Role_Permissions;

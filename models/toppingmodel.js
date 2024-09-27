@@ -1,28 +1,32 @@
 const { Model, DataTypes, sequelize } = require("sequelize");
-const Pizza = require('./pizza');
-
-class Topping extends Model {}
-
-Topping.init({
-  id: {
-    type: DataTypes.UUIDV4,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+const Pizza = require("./pizzamodel");
+module.exports = (sequelize, DataTypes) => {
+  class Topping extends Model {
+    static associate(models) {
+      Topping.belongsToMany(models.Pizza, {
+        through: "pizza_toppings",
+        foreignKey: "topping_id",
+      });
+    }
   }
-}, {
-  sequelize,
-  modelName: 'Topping',
-  tableName: 'toppings',
-  timestamps: false
-});
-Topping.belongsToMany(Pizza, { through: 'pizza_toppings', foreignKey: 'topping_id' });
-
-module.exports = Topping;
+  Topping.init(
+    {
+      id: {
+        type: DataTypes.UUIDV4,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: "Topping",
+      tableName: "toppings",
+      timestamps: false,
+    }
+  );
+  return Topping;
+};

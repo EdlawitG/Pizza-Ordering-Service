@@ -1,0 +1,7 @@
+const express = require('express');
+const upload = require('../config/multer');
+const { createSuperadminAndRestaurant } = require('../controllers/superadmin-controller');
+const router = express.Router();
+
+router.post("/register-admin", upload.single("logo"), createSuperadminAndRestaurant)
+module.exports = router

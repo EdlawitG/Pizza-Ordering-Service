@@ -1,24 +1,33 @@
-const { Model, DataTypes, sequelize } = require("sequelize");
-const Role = require('./role');
+// models/Permission.js
+const { Model, DataTypes } = require('sequelize');
 
-class Permission extends Model {}
-
-Permission.init({
-  id: {
-    type: DataTypes.UUIDV4,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  action: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
+module.exports = (sequelize) => {
+  class Permission extends Model {
+    static associate(models) {
+      Permission.belongsToMany(models.Role, {
+        through: 'role_permissions',
+        foreignKey: 'permission_id',
+      });
+    }
   }
-}, {
-  sequelize,
-  modelName: 'Permission',
-  tableName: 'permissions',
-  timestamps: false
-});
-Permission.belongsToMany(Role, { through: 'role_permissions', foreignKey: 'permission_id' });
-module.exports = Permission;
+
+  Permission.init({
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    action: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+  }, {
+    sequelize,
+    modelName: 'Permission',
+    tableName: 'permissions',
+    timestamps: false,
+  });
+
+  return Permission;
+};
