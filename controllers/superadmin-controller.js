@@ -6,6 +6,7 @@ const { defineSuperadminAbilities } = require("../service/ability");
 const db = require("../models/index");
 const superAdminSchema = require("../validation/superadminSchema");
 const { assignPermissionsToRole } = require("../service/permission");
+const generateToken = require("../middleware/generateToken");
 const createSuperadminAndRestaurant = async (req, res) => {
   const parsedData = superAdminSchema.parse(req.body);
   try {
@@ -95,6 +96,39 @@ const createSuperadminAndRestaurant = async (req, res) => {
     }
   }
 };
+const loginAdmins = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    return res
+      .status(400)
+      .json({ Error: "Email and Password can not be Empty" });
+
+  const admin = await db.Admin.findOne({ where: { email: email } });
+  if (!admin)
+    return res.status(400).json({ message: "Invalid Email or Password" });
+  const validPassword = bcrypt.compareSync(password, admin.password);
+  if (!validPassword) {
+    return res.status(403).send({ message: "Invalid Email or Password" });
+  }
+  try {
+    const payload = {
+      id: admin.id,
+      roleId: admin.role_id,
+    };
+    const token = await generateToken(payload);
+    res.cookie("jwt", token, {
+      httpOnly: false,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({ message: "LoggedIn" });
+  } catch (error) {
+    console.log("Login failed with error : ", error);
+    return res.status(500).json({ Error: error });
+  }
+};
 module.exports = {
   createSuperadminAndRestaurant,
+  loginAdmins
 };
